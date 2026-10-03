@@ -8,7 +8,8 @@
 Docker packages the locked runtime; a trusted reverse proxy connects over HTTP.
 GitHub Actions verifies changes and publishes versioned release images.
 
-**Tech Stack:** Python 3.12, uv, MCP SDK 2.3, Starlette, Uvicorn, pytest, Ruff, mypy, Docker, GitHub Actions.
+**Tech Stack:** Python 3.12, uv, MCP SDK 2.3, Starlette, Uvicorn, pytest, Ruff,
+mypy, Docker, GitHub Actions.
 
 **Spec:** [Project Foundation Design](../specs/2026-10-03-project-foundation-design.md)
 

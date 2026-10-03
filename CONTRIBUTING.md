@@ -16,7 +16,7 @@ content and commit messages use English. Contributions use the MIT License.
 
 The first foundation commit establishes the common base of `main` and
 `development`. GitHub protects every subsequent update with pull requests,
-successful `quality` and `container` checks, resolved review discussions,
+successful `quality`, `container`, `security`, and `documentation` checks, resolved review discussions,
 forward-moving history, and protected branch retention. Protection applies to
 administrators through an empty bypass list. Merge commits preserve Gitflow
 ancestry. The owner reviews and merges PRs; the initial review-approval count is
@@ -35,8 +35,14 @@ git push -u origin feature/service-improvement
 ```
 
 Open a pull request into `development`. Describe the resulting behavior, actual
-validation results, and relevant ADRs. Merge through GitHub when the checks pass
+validation results, documentation impact, and relevant ADRs. Merge through GitHub when the checks pass
 and review discussions are resolved.
+
+Before every commit and push, inspect the branch and upstream with
+`git branch --show-current` and `git status --short --branch`. Commit and push
+from a `feature/*`, `release/*`, or `hotfix/*` branch. Use atomic, buildable
+commits with `<type>: <imperative summary>` messages. Follow the complete
+[quality workflow](docs/quality.md) and record the actual results in the PR.
 
 Keep the topic branch current with its target branch by merging the latest target
 commit into it and pushing the merge commit. Strict CI rules verify an up-to-date

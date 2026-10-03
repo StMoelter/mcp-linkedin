@@ -29,7 +29,9 @@
         "strict_required_status_checks_policy": true,
         "required_status_checks": [
           {"context": "quality", "integration_id": 15368},
-          {"context": "container", "integration_id": 15368}
+          {"context": "container", "integration_id": 15368},
+          {"context": "security", "integration_id": 15368},
+          {"context": "documentation", "integration_id": 15368}
         ]
       }
     }
