@@ -32,25 +32,74 @@ a writable temporary directory, dropped capabilities, and a restricted privilege
 configuration. Docker checks `/health` every 30 seconds. `PORT` accepts a value
 between 1 and 65535; align the container port mapping with the configured value.
 
+## Deploy a published image
+
+Download `compose.deploy.yaml` from the selected repository tag, then run:
+
+```sh
+docker compose -f compose.deploy.yaml pull
+docker compose -f compose.deploy.yaml up -d
+docker compose -f compose.deploy.yaml ps
+docker compose -f compose.deploy.yaml logs mcp-linkedin
+```
+
+The deployment file publishes HTTP on `127.0.0.1:8000` for the host's trusted
+proxy and defaults to `ghcr.io/stmoelter/mcp-linkedin:0.1.0`. Set `MCP_IMAGE`
+in the deployment directory's `.env` file to choose another version or the
+digest printed in the release workflow summary. A digest identifies the exact image:
+
+```dotenv
+MCP_IMAGE=ghcr.io/stmoelter/mcp-linkedin:0.1.0
+```
+
+For a digest, use `MCP_IMAGE=ghcr.io/stmoelter/mcp-linkedin@sha256:<digest>`.
+After changing `.env`, run the same `pull` and `up -d` commands. To return to a
+previous deployment, select its version or digest and repeat those commands.
+Run `python3 scripts/smoke_test.py http://127.0.0.1:8000 0.1.0` from a repository
+checkout to check health, discovered tools, their results, and the expected version.
+
+Set the GHCR package's visibility to **Public** in its package settings to enable
+anonymous image pulls. The multi-platform image supports Linux AMD64 and ARM64.
+Use the [ChatGPT guide](chatgpt.md) to connect through your HTTPS proxy.
+
 ## GitHub Actions
 
 `CI` runs on pull requests targeting `main` or `development`, on pushes to those
-branches, and on manual requests. Required checks are `quality` and `container`.
-The quality check verifies the lockfile, lint, formatting, strict typing, tests,
-and Python distributions. The container check builds the image and verifies HTTP
-health, MCP initialization, and the runtime user.
+branches, and on manual requests. Required checks are `quality`, `container`,
+`security`, and `documentation`. Quality verifies the lockfile, lint, formatting,
+strict typing, 100% application coverage, distributions, and workflow syntax.
+Container verification checks Compose configuration, the image build, HTTP health,
+MCP initialization, tool discovery, both demo calls, and the runtime user.
+Security audits locked dependencies
+and license metadata. Documentation checks Markdown and internal file links.
+Reports are retained for 14 days; see [quality checks](quality.md).
 
-`Release` runs when a stable GitHub release is published. It checks that
+`Release` runs when a `v*` tag is pushed. It checks that
 `vMAJOR.MINOR.PATCH` matches the package version and that the tagged commit is in
-main's history. It reruns CI and publishes:
+main's history. It reruns all four CI checks and publishes:
 
 - `ghcr.io/stmoelter/mcp-linkedin:<version>`
 - `ghcr.io/stmoelter/mcp-linkedin:sha-<commit>`
 
 The publishing job uses GitHub's scoped `GITHUB_TOKEN` with package write
-permission. The repository owner manages GHCR package visibility and consumer
-access. Deploy a selected version or digest through the hosting environment's
-container orchestration, then verify `/health` and MCP initialization.
+permission. The workflow completes with registry publication and prints the
+versioned image name and digest in its summary. GitHub builds and publishes;
+operators deploy the image from GHCR using the hosting environment's orchestration.
+The repository tag provides the deployment file and companion plugin skill.
+
+Prepare the release through the Gitflow procedure in [CONTRIBUTING.md](../CONTRIBUTING.md).
+After the release PR has merged into main, tag its merged commit:
+
+```sh
+git fetch origin
+git tag -a v0.1.0 origin/main -m "Release 0.1.0"
+git push origin v0.1.0
+gh run list --workflow release.yml
+docker pull ghcr.io/stmoelter/mcp-linkedin:0.1.0
+```
+
+The tag starts image verification and publication directly. A successful release
+provides the image coordinates needed to deploy the tested version.
 
 ## References
 

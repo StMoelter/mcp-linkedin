@@ -19,6 +19,7 @@
         "dismiss_stale_reviews_on_push": true,
         "require_code_owner_review": false,
         "require_last_push_approval": false,
+        "require_extra_approval_for_unattributed_changes": false,
         "required_review_thread_resolution": true,
         "allowed_merge_methods": ["merge"]
       }
@@ -29,7 +30,9 @@
         "strict_required_status_checks_policy": true,
         "required_status_checks": [
           {"context": "quality", "integration_id": 15368},
-          {"context": "container", "integration_id": 15368}
+          {"context": "container", "integration_id": 15368},
+          {"context": "security", "integration_id": 15368},
+          {"context": "documentation", "integration_id": 15368}
         ]
       }
     }

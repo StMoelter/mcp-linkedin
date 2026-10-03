@@ -14,3 +14,5 @@ build/
 !.env.example
 .DS_Store
 .worktrees/
+reports/
+.lycheecache

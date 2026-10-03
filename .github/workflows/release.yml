@@ -1,11 +1,15 @@
 name: Release
 
 on:
-  release:
-    types: [published]
+  push:
+    tags: ["v*"]
 
 permissions:
   contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   verify-release:
@@ -15,30 +19,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
       - name: Verify main ancestry and package version
         id: version
         env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-          PRERELEASE: ${{ github.event.release.prerelease }}
+          RELEASE_TAG: ${{ github.ref_name }}
         run: |
-          git merge-base --is-ancestor HEAD origin/main
-          python3 - <<'PY'
-          import os
-          import re
-          import tomllib
-          from pathlib import Path
-
-          tag = os.environ["RELEASE_TAG"]
-          assert re.fullmatch(r"v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)", tag), "Use vMAJOR.MINOR.PATCH"
-          assert os.environ["PRERELEASE"] == "false", "Publish a stable release"
-          version = tomllib.loads(Path("pyproject.toml").read_text())["project"]["version"]
-          assert tag == f"v{version}", "Release tag must match package version"
-          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
-              output.write(f"version={version}\n")
-          PY
+          version=$(python3 scripts/verify_release.py "$RELEASE_TAG")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
   verify:
     needs: verify-release
@@ -50,16 +39,19 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      image: ${{ steps.image.outputs.name }}
+      digest: ${{ steps.build.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }}
           persist-credentials: false
       - name: Image coordinates
         id: image
         env:
           REPOSITORY: ${{ github.repository }}
         run: echo "name=ghcr.io/${REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
@@ -67,8 +59,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v6
+        id: build
         with:
           context: .
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: |
             ${{ steps.image.outputs.name }}:${{ needs.verify-release.outputs.version }}
@@ -77,3 +71,15 @@ jobs:
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.licenses=MIT
             org.opencontainers.image.version=${{ needs.verify-release.outputs.version }}
+            org.opencontainers.image.revision=${{ github.sha }}
+      - name: Published image coordinates
+        env:
+          IMAGE: ${{ steps.image.outputs.name }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+          VERSION: ${{ needs.verify-release.outputs.version }}
+        run: |
+          {
+            echo "Image: \`$IMAGE:$VERSION\`"
+            echo "Digest: \`$IMAGE@$DIGEST\`"
+            echo "Platforms: Linux AMD64 and ARM64"
+          } >> "$GITHUB_STEP_SUMMARY"
