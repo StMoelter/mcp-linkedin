@@ -52,7 +52,7 @@ and [enforced quality](../../adr/0006-enforced-quality-checks.md).
 
 ### Task 3: GitHub integration
 
-- [ ] Commit and push the verified feature branch.
+- [x] Commit and push the verified feature branch.
 - [ ] Create its PR to `development` with authenticated GitHub access.
 - [ ] Apply the four-check ruleset using repository administrator authentication.
 - [ ] Verify effective branch rules and successful GitHub checks on the PR.
