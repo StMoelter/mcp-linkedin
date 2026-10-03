@@ -21,6 +21,7 @@ forward-moving history, and protected branch retention. Protection applies to
 administrators through an empty bypass list. Merge commits preserve Gitflow
 ancestry. The owner reviews and merges PRs; the initial review-approval count is
 zero, supporting an owner-led project with coding agents.
+This approval policy also applies to agent-authored commits with local Git identities.
 
 ### Features
 
