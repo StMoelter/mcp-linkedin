@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-linkedin"
+version = "0.1.0"
+description = "A container-ready LinkedIn MCP server using Streamable HTTP."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+authors = [{ name = "Steffen Moelter" }]
+dependencies = [
+    "mcp>=2.3.0,<3",
+    "starlette>=0.52,<1",
+    "uvicorn>=0.41,<1",
+]
+
+[project.urls]
+Repository = "https://github.com/StMoelter/mcp-linkedin"
+
+[project.scripts]
+mcp-linkedin = "mcp_linkedin.__main__:main"
+
+[dependency-groups]
+dev = ["httpx>=0.28,<1", "mypy>=1.19,<2", "pytest>=9,<10", "ruff>=0.15,<1"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcp_linkedin"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src"]

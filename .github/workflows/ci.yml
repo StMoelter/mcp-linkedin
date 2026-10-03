@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, development]
+  push:
+    branches: [main, development]
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.7"
+          enable-cache: true
+      - run: uv sync --locked --python 3.12
+      - run: uv run --locked ruff check .
+      - run: uv run --locked ruff format --check .
+      - run: uv run --locked mypy
+      - run: uv run --locked pytest
+      - run: uv build
+
+  container:
+    name: container
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: docker build --tag mcp-linkedin:test .
+      - name: Start container
+        run: >-
+          docker run --detach --name mcp-linkedin-test
+          --read-only --tmpfs /tmp --cap-drop ALL
+          --security-opt no-new-privileges:true
+          --publish 127.0.0.1:8000:8000 mcp-linkedin:test
+      - run: python3 scripts/smoke_test.py
+      - name: Verify runtime user
+        run: test "$(docker exec mcp-linkedin-test id -u)" = "10001"
+      - name: Container logs
+        if: always()
+        run: docker logs mcp-linkedin-test
+      - name: Stop container
+        if: always()
+        run: docker rm --force mcp-linkedin-test
