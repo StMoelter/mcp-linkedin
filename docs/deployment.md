@@ -35,10 +35,13 @@ between 1 and 65535; align the container port mapping with the configured value.
 ## GitHub Actions
 
 `CI` runs on pull requests targeting `main` or `development`, on pushes to those
-branches, and on manual requests. Required checks are `quality` and `container`.
-The quality check verifies the lockfile, lint, formatting, strict typing, tests,
-and Python distributions. The container check builds the image and verifies HTTP
-health, MCP initialization, and the runtime user.
+branches, and on manual requests. Required checks are `quality`, `container`,
+`security`, and `documentation`. Quality verifies the lockfile, lint, formatting,
+strict typing, 100% application coverage, distributions, and workflow syntax.
+Container verification checks Compose configuration, the image build, HTTP health,
+MCP initialization, and the runtime user. Security audits locked dependencies
+and license metadata. Documentation checks Markdown and internal file links.
+Reports are retained for 14 days; see [quality checks](quality.md).
 
 `Release` runs when a stable GitHub release is published. It checks that
 `vMAJOR.MINOR.PATCH` matches the package version and that the tagged commit is in

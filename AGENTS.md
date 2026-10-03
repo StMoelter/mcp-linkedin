@@ -38,6 +38,35 @@ with their PR target using merge commits. Use ordinary pushes on topic branches.
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) before changing the repository.
 
+Before every commit and push, run `git branch --show-current` and
+`git status --short --branch`. Work from `feature/*`, `release/*`, or `hotfix/*`
+and check the branch's upstream. Hand off changes by pushing the topic branch
+and creating or updating its PR. Keep each commit atomic, buildable, and testable;
+use `<type>: <imperative summary>` with a body when context helps the reviewer.
+
+## Implementation rules
+
+- Make focused changes that directly serve the requested outcome.
+- Use clear, specific names and give each unit one coherent responsibility.
+- Prefer the smallest sufficient design; add abstractions for demonstrated needs.
+- Keep each business rule and configuration decision in one authoritative place.
+- Group shared code by meaning and responsibility.
+- Use comments to explain necessary reasons and unexpected library behavior.
+- Verify material assumptions and clarify requirements that change the result.
+- Write durable artifacts that stand on their own and describe the current behavior.
+- Use maintained libraries and framework functions for standard technical tasks;
+  document the reason for a custom implementation in the relevant ADR.
+- Introduce LinkedIn HTTP access through explicit, typed interfaces alongside the
+  first consuming feature. Keep remote payload conversion and credentials inside
+  the integration component, and pass only the interface a consumer needs.
+
+## Reviews
+
+Inspect the complete diff and its relevant contracts. Report concrete findings
+with a location, observable effect, and applicable project rule. Distinguish
+verified defects from uncertainty. Complete delegated reviews before reporting
+their outcome, and include the review's material findings in the handoff.
+
 ## Dependencies and verification
 
 Manage dependencies using uv and commit `uv.lock` with dependency changes.
@@ -54,9 +83,22 @@ docker build --tag mcp-linkedin:test .
 ```
 
 Exercise HTTP and MCP behavior through real application boundaries. Match test
-scope to the behavior changed. For runtime/container changes, run the container
+scope to the behavior changed. Own application code requires 100% line and branch
+coverage. Strict typing covers application code, tests, and Python scripts.
+Application tests use local fixtures, fakes, or testcontainers for remote APIs;
+control time and random seeds when they affect results. For runtime/container changes, run the container
 and `python3 scripts/smoke_test.py`; verify health and UID 10001. Include actual
 validation results and material limitations in the PR.
+
+Run the security and documentation checks in [docs/quality.md](docs/quality.md).
+All four CI checks (`quality`, `container`, `security`, `documentation`) govern
+permanent-branch updates. Dependency license metadata is checked against the
+explicit project list; review additions individually. Known vulnerability findings
+require correction or an individually justified, dated exception with an expiry.
+
+Update setup, behavior, command, and architecture documentation in the same
+change as the implementation. Keep internal links valid, use consistent Markdown,
+and describe supported behavior and operational responsibilities positively.
 
 ## Architecture decisions
 

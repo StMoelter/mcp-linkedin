@@ -26,6 +26,10 @@ uv run pytest
 uv build
 ```
 
+The test suite enforces 100% line and branch coverage for the application.
+Strict type checks include tests and Python scripts. See [quality checks](docs/quality.md)
+for dependency audits, documentation checks, and the complete local workflow.
+
 ## Docker
 
 ```sh
