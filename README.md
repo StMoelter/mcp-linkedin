@@ -63,8 +63,8 @@ docker run --rm -p 127.0.0.1:8000:8000 ghcr.io/stmoelter/mcp-linkedin:0.1.0
 ```
 
 Push a `vMAJOR.MINOR.PATCH` tag to trigger the release workflow. After verification,
-it publishes Linux AMD64/ARM64 images with version and `sha-<commit>` tags, then
-creates a GitHub release with deployment and skill assets. See [deployment](docs/deployment.md)
+it publishes Linux AMD64/ARM64 images with version and `sha-<commit>` tags to GHCR.
+The workflow summary provides the image digest. See [deployment](docs/deployment.md)
 for the proxy contract and release procedure.
 
 ## Collaboration

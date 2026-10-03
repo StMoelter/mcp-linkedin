@@ -41,8 +41,7 @@ repeat the connection check to confirm the deployed version.
 
 ## Add the companion skill
 
-The release includes `test-mcp-server-<version>.zip`, containing the portable
-`test-mcp-server/SKILL.md`. The same source lives in
+The repository tag includes the portable
 [skills/test-mcp-server/SKILL.md](../skills/test-mcp-server/SKILL.md).
 
 Add that skill to the plugin connected to your server. For a plugin package,

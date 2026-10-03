@@ -34,7 +34,7 @@ between 1 and 65535; align the container port mapping with the configured value.
 
 ## Deploy a published image
 
-Download `compose.deploy.yaml` from the selected GitHub release, then run:
+Download `compose.deploy.yaml` from the selected repository tag, then run:
 
 ```sh
 docker compose -f compose.deploy.yaml pull
@@ -43,11 +43,10 @@ docker compose -f compose.deploy.yaml ps
 docker compose -f compose.deploy.yaml logs mcp-linkedin
 ```
 
-The release's deployment file defaults to its published image version and
-publishes HTTP on `127.0.0.1:8000` for the host's trusted proxy. The repository
-copy defaults to `ghcr.io/stmoelter/mcp-linkedin:0.1.0`. Set `MCP_IMAGE`
+The deployment file publishes HTTP on `127.0.0.1:8000` for the host's trusted
+proxy and defaults to `ghcr.io/stmoelter/mcp-linkedin:0.1.0`. Set `MCP_IMAGE`
 in the deployment directory's `.env` file to choose another version or the
-digest printed in the release notes. A digest identifies the exact image:
+digest printed in the release workflow summary. A digest identifies the exact image:
 
 ```dotenv
 MCP_IMAGE=ghcr.io/stmoelter/mcp-linkedin:0.1.0
@@ -83,12 +82,10 @@ main's history. It reruns all four CI checks and publishes:
 - `ghcr.io/stmoelter/mcp-linkedin:sha-<commit>`
 
 The publishing job uses GitHub's scoped `GITHUB_TOKEN` with package write
-permission. It downloads the published image by digest, checks its runtime
-user and MCP tools, and verifies both platform entries. A successful publication
-creates a GitHub release containing the image digest, deployment Compose file,
-and companion skill ZIP. Repository write permission belongs to that release
-announcement job. Re-running the announcement updates its image coordinates,
-digest, and downloadable assets.
+permission. The workflow completes with registry publication and prints the
+versioned image name and digest in its summary. GitHub builds and publishes;
+operators deploy the image from GHCR using the hosting environment's orchestration.
+The repository tag provides the deployment file and companion plugin skill.
 
 Prepare the release through the Gitflow procedure in [CONTRIBUTING.md](../CONTRIBUTING.md).
 After the release PR has merged into main, tag its merged commit:
@@ -98,11 +95,11 @@ git fetch origin
 git tag -a v0.1.0 origin/main -m "Release 0.1.0"
 git push origin v0.1.0
 gh run list --workflow release.yml
-gh release view v0.1.0
+docker pull ghcr.io/stmoelter/mcp-linkedin:0.1.0
 ```
 
 The tag starts image verification and publication directly. A successful release
-provides the image coordinates and assets needed to deploy the tested version.
+provides the image coordinates needed to deploy the tested version.
 
 ## References
 

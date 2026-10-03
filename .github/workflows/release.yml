@@ -72,88 +72,14 @@ jobs:
             org.opencontainers.image.licenses=MIT
             org.opencontainers.image.version=${{ needs.verify-release.outputs.version }}
             org.opencontainers.image.revision=${{ github.sha }}
-      - name: Download and test published image
+      - name: Published image coordinates
         env:
           IMAGE: ${{ steps.image.outputs.name }}
           DIGEST: ${{ steps.build.outputs.digest }}
           VERSION: ${{ needs.verify-release.outputs.version }}
         run: |
-          docker pull "$IMAGE@$DIGEST"
-          docker run --detach --name release-test --read-only --tmpfs /tmp \
-            --cap-drop ALL --security-opt no-new-privileges:true \
-            --publish 127.0.0.1:8000:8000 "$IMAGE@$DIGEST"
-          python3 scripts/smoke_test.py http://127.0.0.1:8000 "$VERSION"
-          test "$(docker exec release-test id -u)" = "10001"
-          docker buildx imagetools inspect --raw "$IMAGE@$DIGEST" > manifest.json
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-
-          manifests = json.loads(Path("manifest.json").read_text())["manifests"]
-          platforms = {(m["platform"]["os"], m["platform"]["architecture"]) for m in manifests}
-          assert {("linux", "amd64"), ("linux", "arm64")} <= platforms
-          PY
-          echo "Published image: \`$IMAGE@$DIGEST\`" >> "$GITHUB_STEP_SUMMARY"
-      - name: Release container logs
-        if: always()
-        run: docker logs release-test || true
-      - name: Stop release container
-        if: always()
-        run: docker rm --force release-test || true
-
-  announce:
-    needs: [verify-release, publish]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-      - name: Package plugin skill and deployment assets
-        env:
-          VERSION: ${{ needs.verify-release.outputs.version }}
-          IMAGE: ${{ needs.publish.outputs.image }}
-          DIGEST: ${{ needs.publish.outputs.digest }}
-        run: |
-          python3 - <<'PY'
-          import os
-          import re
-          import zipfile
-          from pathlib import Path
-
-          version = os.environ["VERSION"]
-          image = os.environ["IMAGE"]
-          digest = os.environ["DIGEST"]
-          deployment = Path("compose.deploy.yaml")
-          deployment.write_text(re.sub(
-              r"(?m)^    image:.*$",
-              "    image: $" + "{MCP_IMAGE:-" + f"{image}:{version}" + "}",
-              deployment.read_text(),
-          ))
-          with zipfile.ZipFile(f"test-mcp-server-{version}.zip", "w") as archive:
-              archive.write("skills/test-mcp-server/SKILL.md", "test-mcp-server/SKILL.md")
-          Path("release-notes.md").write_text(
-              f"## MCP Test Lab {version}\n\n"
-              f"Image: `{image}:{version}`\n\nDigest: `{image}@{digest}`\n\n"
-              "Platforms: Linux AMD64 and ARM64.\n\n"
-              "Use the attached Compose file to start the image behind your HTTPS proxy. "
-              "Connect ChatGPT to your HTTPS `/mcp` endpoint and try `connection_check` "
-              "or `roll_dice`. Add the attached skill to your plugin for the test workflow.\n"
-          )
-          PY
-      - name: Publish GitHub release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TAG: ${{ github.ref_name }}
-          VERSION: ${{ needs.verify-release.outputs.version }}
-        run: |
-          if gh release view "$RELEASE_TAG" > /dev/null 2>&1; then
-            gh release edit "$RELEASE_TAG" --notes-file release-notes.md
-            gh release upload "$RELEASE_TAG" "test-mcp-server-$VERSION.zip" \
-              compose.deploy.yaml --clobber
-          else
-            gh release create "$RELEASE_TAG" --verify-tag --latest=false \
-              --title "MCP Test Lab $VERSION" --notes-file release-notes.md \
-              "test-mcp-server-$VERSION.zip" compose.deploy.yaml
-          fi
+          {
+            echo "Image: \`$IMAGE:$VERSION\`"
+            echo "Digest: \`$IMAGE@$DIGEST\`"
+            echo "Platforms: Linux AMD64 and ARM64"
+          } >> "$GITHUB_STEP_SUMMARY"

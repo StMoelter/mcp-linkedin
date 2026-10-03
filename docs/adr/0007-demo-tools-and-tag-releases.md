@@ -4,6 +4,7 @@
 - Date: 2026-10-03
 - Extends: [0002](0002-http-container-runtime.md)
 - Supersedes the release trigger in: [0004](0004-github-delivery.md)
+- Publication boundary updated by: [0008](0008-registry-release-boundary.md)
 
 ## Context
 

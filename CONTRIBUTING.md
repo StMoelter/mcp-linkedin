@@ -57,7 +57,7 @@ topic branch before merging the pull request.
 4. Tag the merged main commit as `v<version>` and push the tag.
 5. Follow the tag-triggered workflow. GitHub Actions verifies the tag, package
    version, main ancestry, and all four CI checks, then publishes the multi-platform
-   container to GHCR and creates the GitHub release with deployment and skill assets.
+   container to GHCR. Its summary provides the image name and digest for deployment.
 6. Create `feature/sync-main-<version>` from the latest `development`, merge
    `origin/main` into it, and open its PR into `development`. Merge after CI.
 
