@@ -15,7 +15,7 @@ integration, and provide deployment instructions and a portable plugin skill.
 - [x] Document deployment, ChatGPT connection, release procedure, and decisions.
 - [x] Complete local quality checks, container checks, and independent review.
 - [x] Activate effective branch protection and integrate the foundation PR.
-- [ ] Integrate the demo through its checked PR.
+- [x] Integrate the demo through its checked PR.
 - [ ] Integrate release preparation into main, tag, and verify the published image.
 - [ ] Synchronize main into development through a PR.
 
@@ -50,3 +50,6 @@ GitHub administrator authentication is verified. The active branch rules enforce
 PRs, all four CI checks, forward-moving history, and protected branch retention.
 The approval count of zero is consistent across rulesets and classic protection.
 The operator provides the HTTPS endpoint for the final ChatGPT connection test.
+
+Foundation PR #1 and demo PR #2 merged into development after all four GitHub
+checks passed. The release branch is prepared from that integrated history.
