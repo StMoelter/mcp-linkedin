@@ -1,0 +1,15 @@
+services:
+  mcp-linkedin:
+    image: ${MCP_IMAGE:-ghcr.io/stmoelter/mcp-linkedin:0.1.0}
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      PORT: "8000"
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true

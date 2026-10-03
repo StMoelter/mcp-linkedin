@@ -12,11 +12,20 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.routing import Mount, Route
 
+from mcp_linkedin.demo import register_demo_tools
+
 
 def create_app() -> Starlette:
     """Create an independent MCP runtime for a trusted HTTP backend."""
     service_version = version("mcp-linkedin")
-    mcp = MCPServer("mcp-linkedin", version=service_version)
+    mcp = MCPServer(
+        "mcp-linkedin",
+        version=service_version,
+        instructions=(
+            "Use connection_check to verify the live server and roll_dice to try dice rolls."
+        ),
+    )
+    register_demo_tools(mcp, service_version)
 
     @mcp.resource("server://info", mime_type="application/json")
     def server_info() -> str:

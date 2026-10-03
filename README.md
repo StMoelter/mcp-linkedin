@@ -18,6 +18,19 @@ The server listens on `0.0.0.0:8000`. MCP clients connect to
 `http://localhost:8000/mcp`. `GET /health` returns `{"status":"ok"}`.
 The MCP resource `server://info` provides the service name and version.
 
+## MCP Test Lab
+
+Two anonymous tools let you try the deployed server from ChatGPT:
+
+| Tool | Inputs | Result |
+| --- | --- | --- |
+| `connection_check` | Optional `message` | Echoed message, server name, installed version |
+| `roll_dice` | `count` (1–20), `sides` (2–100) | Individual rolls and their sum |
+
+The connection check defaults to `Hello from ChatGPT`; dice default to one
+six-sided die. See [Try MCP Test Lab in ChatGPT](docs/chatgpt.md) for connection
+steps, example prompts, and the companion plugin skill.
+
 ```sh
 uv run ruff check .
 uv run ruff format --check .
@@ -49,8 +62,9 @@ For published releases:
 docker run --rm -p 127.0.0.1:8000:8000 ghcr.io/stmoelter/mcp-linkedin:0.1.0
 ```
 
-Release tags follow `vMAJOR.MINOR.PATCH`. The release workflow publishes the version
-tag and `sha-<commit>` tag after verification. See [deployment](docs/deployment.md)
+Push a `vMAJOR.MINOR.PATCH` tag to trigger the release workflow. After verification,
+it publishes Linux AMD64/ARM64 images with version and `sha-<commit>` tags to GHCR.
+The workflow summary provides the image digest. See [deployment](docs/deployment.md)
 for the proxy contract and release procedure.
 
 ## Collaboration

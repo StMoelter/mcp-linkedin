@@ -14,3 +14,5 @@ A later decision can supersede an earlier record with explicit cross-links.
 | [0004](0004-github-delivery.md) | GitHub verification and release delivery | Accepted |
 | [0005](0005-established-technical-tools.md) | Established technical tools and explicit interfaces | Accepted |
 | [0006](0006-enforced-quality-checks.md) | Enforced tests, dependency audits, and documentation checks | Accepted |
+| [0007](0007-demo-tools-and-tag-releases.md) | Anonymous demo tools and tag-triggered multi-platform releases | Accepted |
+| [0008](0008-registry-release-boundary.md) | Release delivery ends at the public container registry | Accepted |
