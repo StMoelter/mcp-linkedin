@@ -73,3 +73,9 @@ Development follows [Gitflow](CONTRIBUTING.md): `main` holds releases and
 `development` integrates features. Pull requests and successful CI checks govern
 updates to both branches. Read [AGENTS.md](AGENTS.md) for coding-agent instructions
 and [architecture decisions](docs/adr/README.md) for the project conventions.
+
+## ChatGPT Site source
+
+The private connection and dice Site is stored in
+[sites/mcp-verbindung-wuerfel](sites/mcp-verbindung-wuerfel/README.md).
+That directory provides its source, local development commands, and publishing boundary.
