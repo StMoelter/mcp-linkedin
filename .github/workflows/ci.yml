@@ -13,6 +13,7 @@ permissions:
 
 jobs:
   quality:
+    needs: sites
     name: quality
     runs-on: ubuntu-latest
     steps:
@@ -138,3 +139,33 @@ jobs:
           path: reports/
           retention-days: 14
           if-no-files-found: warn
+
+  sites:
+    name: sites
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sites/linkedin-api
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.19.0"
+      - name: Install pinned package manager
+        run: npm install --global pnpm@11.25.0
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check application types and lint
+        run: pnpm exec tsc --noEmit && pnpm run lint
+      - name: Coverage gate and built Worker E2E
+        run: pnpm test
+      - name: Application test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sites-test-reports
+          path: sites/linkedin-api/reports/
+          retention-days: 14
+          if-no-files-found: error
