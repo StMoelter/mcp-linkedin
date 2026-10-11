@@ -48,9 +48,18 @@ sharing requires Sites access provisioning and end-to-end identity validation.
 The TypeScript deployment is an explicit proposed addition to the Python-only
 architecture. Its focused security behavior tests run against local Miniflare D1
 and simulated LinkedIn responses. Python retains its enforced 100% coverage.
-The Sites addition has no complete line/branch coverage gate yet. Review this
-architecture and add its own CI coverage, dependency auditing, and license checks
+The Sites addition enforces 100% line, branch, and function coverage per
+application file and rejects source files omitted from the report. CI runs this
+gate plus E2E scenarios through the built Worker, real D1, and simulated LinkedIn
+responses. The protected Python quality job depends on that Sites job. Vendored
+platform build source is tracked with its license to support clean clones.
+Review the architecture and add dedicated dependency auditing and license checks
 before integrating this draft into a permanent branch.
+
+Built Worker E2E tests exposed two runtime compatibility defects: native fetch
+requires its global receiver, and Workers supports manual or follow redirect
+modes. Bind fetch to its global context, request manual redirects, and reject
+all redirect responses. This keeps credentials at the fixed LinkedIn endpoints.
 
 The source and setup instructions are public in GitHub. Deployment secrets and
 user tokens stay in private runtime storage. Separately deployed copies supply

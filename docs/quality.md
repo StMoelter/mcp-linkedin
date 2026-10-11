@@ -94,3 +94,21 @@ image to GHCR. CI retains JUnit, XML/HTML coverage, license, vulnerability, and
 link reports as artifacts for 14 days. Reports are generated under the ignored
 `reports/` directory. GitHub enforces all four successful checks before merging
 through the active branch ruleset.
+
+## Sites application
+
+Use Node.js 24 and pnpm 11.25.0 in `sites/linkedin-api`:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm exec tsc --noEmit
+pnpm run lint
+pnpm test
+```
+
+The coverage gate requires 100% lines, branches, and functions for every
+application file in `app/`, `db/`, and `lib/linkedin/`, including otherwise
+unloaded files. E2E tests rebuild the production Worker and use Miniflare, D1,
+and simulated LinkedIn responses. The `sites` CI job retains JSON, LCOV, and
+JUnit reports. The required `quality` check depends on this job. Live LinkedIn
+and installed ChatGPT plugin verification remain separate configuration tasks.

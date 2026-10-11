@@ -70,7 +70,8 @@ No LinkedIn post was created during local tests.
 
 ## Development
 
-Use the pinned package manager through `npm run install:ci`, then run:
+Use Node.js 24 and the pinned package manager through `npm run install:ci`,
+then run:
 
 ```sh
 npm test
@@ -79,10 +80,34 @@ node node_modules/typescript/bin/tsc --noEmit
 npm run build
 ```
 
-Tests exercise the handler and D1 SQL in Miniflare with simulated LinkedIn
-responses, including OAuth replay, identity separation, token encryption,
-publication confirmation, deduplication, and uncertain outcomes. Sites packages
-the Worker and applies the committed Drizzle migration on deployment.
+`npm test` enforces 100% line, branch, and function coverage for every TypeScript
+application file under `app/`, `db/`, and `lib/linkedin/`. The gate checks each
+file individually and rejects application files absent from the report. No
+application branches use coverage ignore directives. Framework libraries,
+unchanged starter connector scaffolding, vendored platform files, stylesheets,
+and test utilities are outside the application coverage inventory.
+
+The unit and D1 integration suite covers OAuth replay, identity separation,
+encryption, refresh, expiry, input validation, errors, and publication safety.
+UI tests render the real React page with isolated platform boundaries. The E2E
+suite rebuilds and executes the production Worker in Miniflare with real route
+handling, D1, and outbound fetch. It covers OAuth, profiles, UI status, disconnect,
+two isolated users, CSRF, denial, expiry, confirmation, concurrent publication,
+and uncertain outcomes. LinkedIn responses and trusted Sites identities are
+local fixtures. Every E2E scenario has independent database state. It sends no
+real LinkedIn requests and does not validate ChatGPT installation or real Sites
+identity injection. Browser interaction is a separate verification step.
+
+Run `npm run test:coverage` or `npm run test:e2e` individually when useful.
+Reports are generated at `reports/coverage.json`, `reports/coverage.lcov`, and
+`reports/e2e.xml`. The repository CI runs both suites. Its protected `quality`
+check depends on the Sites job. Vendored platform source and its MIT notice are
+tracked under `platform/`, enabling builds from a fresh clone.
+
+The runtime binds native fetch to its global context. LinkedIn requests use
+manual redirects and reject redirect responses, preserving credential boundaries
+and compatibility with Cloudflare Workers. Sites packages the Worker and applies
+the committed Drizzle migration on deployment.
 
 The production Site is [LinkedIn API](https://linkedin-api.steffenm-0815.chatgpt.site).
 The hosted MCP endpoint is `/mcp`. Sites provisions the private plugin entry.

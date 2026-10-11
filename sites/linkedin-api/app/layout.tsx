@@ -1,7 +1,6 @@
-import type { Metadata } from "next";
 import "./globals.css";
 
-export const metadata: Metadata = {
+export const metadata: import("next").Metadata = {
   title: "LinkedIn API",
   description: "Deine eigene LinkedIn-Verbindung für ChatGPT.",
   icons: {

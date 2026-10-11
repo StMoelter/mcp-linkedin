@@ -30,7 +30,11 @@ export function createHandler(config:Config) {
   }
   const redirectUri=()=>`${config.origin}/auth/linkedin/callback`;
   async function api(url:string,init:RequestInit):Promise<Response> {
-    try { return await config.fetch(url,{...init,redirect:'error',signal:AbortSignal.timeout(20000)}); }
+    try {
+      const response=await config.fetch(url,{...init,redirect:'manual',signal:AbortSignal.timeout(20000)});
+      if(response.status>=300 && response.status<400) throw new Failure('linkedin_unavailable',502);
+      return response;
+    }
     catch { throw new Failure('linkedin_unavailable',502); }
   }
   async function profile(accessToken:string):Promise<Profile> {
