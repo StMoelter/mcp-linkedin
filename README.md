@@ -73,3 +73,10 @@ Development follows [Gitflow](CONTRIBUTING.md): `main` holds releases and
 `development` integrates features. Pull requests and successful CI checks govern
 updates to both branches. Read [AGENTS.md](AGENTS.md) for coding-agent instructions
 and [architecture decisions](docs/adr/README.md) for the project conventions.
+
+## Private LinkedIn Sites application
+
+The separate [LinkedIn API Site](sites/linkedin-api/README.md) implements
+per-user OAuth, encrypted D1 connections, and three authenticated LinkedIn MCP
+tools. See [ADR 0010](docs/adr/0010-linkedin-sites-oauth.md) for its proposed
+deployment boundary and validation requirements.
